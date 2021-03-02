@@ -1,0 +1,124 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+  <!ENTITY name      "nct6687-driver">
+  <!ENTITY author    "ich777">
+  <!ENTITY version   "2021.03.02">
+  <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
+  <!ENTITY pluginURL "&gitURL;/&name;.plg">
+  <!ENTITY plugin    "/boot/config/plugins/&name;">
+  <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0">
+
+<CHANGES>
+###2021.03.02
+- Initial release
+
+</CHANGES>
+
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version;')
+</INLINE>
+</FILE>
+
+<FILE Name="&emhttp;/images/nct6687-driver.png">
+<URL>https://git.minenet.at/ich777/docker-templates/raw/branch/master/ich777/images/nuvoton.png</URL>
+</FILE>
+
+<FILE Name="&emhttp;/README.md">
+<INLINE>
+**Nuvoton NCT6687 Driver**
+
+This package contains the NCT6687 Drivers and installs them for using it with the Dynamix System Temperature Plugin.  
+  
+Source: https://github.com/Fred78290/nct6687d
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+
+KERNEL_V="$(uname -r)"
+PACKAGE="nct6687d"
+DL_URL="https://github.com/ich777/unraid-plugins-repo/releases/download/$KERNEL_V"
+
+if [ ! -d "&plugin;/packages/${KERNEL_V%%-*}" ]; then
+  mkdir -p "&plugin;/packages/${KERNEL_V%%-*}"
+fi
+
+#Check for old packages
+rm -rf $(ls -d &plugin;/packages/* | grep -v "${KERNEL_V%%-*}")
+
+download() {
+#Download NCT6687d Drivers
+if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz" "${DL_URL}/${PACKAGE}-1.txz" ; then
+  if [ "$(md5sum "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/${PACKAGE}-1.txz.md5" | cut -d ' ' -f1)" ]; then
+    echo
+    echo "---CHECKSUM ERROR!---"
+    exit 1
+  fi
+  echo
+  echo "-------------------Sucessfully downloaded NCT6687d Drivers--------------------"
+else
+  echo
+  echo "-----------------------Can't download NCT6687d Drivers------------------------"
+  exit 1
+fi
+}
+
+check() {
+if [ ! -f "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
+  echo
+  echo "-----------------------Downloading NCT6687d Drivers!-------------------------"
+  echo "---------This could take some time, please don't close this window!----------"
+  download
+elif [ ! -s "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
+  rm -rf &plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz
+  echo
+  echo "----Download is empty please contact the developer of this plugin if the-----"
+  echo "----------plugin has been already built against that Kernel version----------"
+  exit 1
+else
+  echo
+  echo "-----------------------NCT6687d Drivers found locally------------------------"
+fi
+}
+
+install() {
+#Install NCT6687d Drivers
+/sbin/installpkg "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz"
+depmod -a
+/sbin/modprobe nct6687
+}
+
+#Check if NCT6687d Drivers are allready downloaded
+check
+install > /dev/null
+
+echo
+echo "----------------Installation of NCT6687d Drivers successfull-----------------"
+echo
+
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+
+echo "-----------------------------------"
+echo "---Uninstalling NCT6687d Drivers---"
+echo "-----------------------------------"
+# Remove plugin related files
+rm -rf /usr/local/emhttp/plugins/&name;
+rm -rf &plugin;
+echo
+echo "--------------------------------------------------------------"
+echo "---NCT6687d Drivers uninstalled, please reboot your server!---"
+echo "--------------------------------------------------------------"
+echo
+
+</INLINE>
+</FILE>
+</PLUGIN>
