@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "nct6687-driver">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2021.03.02">
+  <!ENTITY version   "2021.03.24">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
@@ -12,6 +12,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0">
 
 <CHANGES>
+
+###2021.03.24
+- Integrated icon into package
+
 ###2021.03.02
 - Initial release
 
@@ -21,10 +25,6 @@
 <INLINE>
 rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version;')
 </INLINE>
-</FILE>
-
-<FILE Name="&emhttp;/images/nct6687-driver.png">
-<URL>https://git.minenet.at/ich777/docker-templates/raw/branch/master/ich777/images/nuvoton.png</URL>
 </FILE>
 
 <FILE Name="&emhttp;/README.md">
@@ -60,10 +60,10 @@ if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packag
     exit 1
   fi
   echo
-  echo "-------------------Sucessfully downloaded NCT6687d Drivers--------------------"
+  echo "-------------------Sucessfully downloaded NCT6687d Drivers-------------------"
 else
   echo
-  echo "-----------------------Can't download NCT6687d Drivers------------------------"
+  echo "-----------------------Can't download NCT6687d Drivers-----------------------"
   exit 1
 fi
 }
@@ -97,8 +97,14 @@ depmod -a
 check
 install > /dev/null
 
+#Check if icon is already installed
+if [ ! -f &emhttp;/images/nuvoton.png ]; then
+  mkdir -p &emhttp;/images
+  wget -O &emhttp;/images/nuvoton.png https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/nuvoton.png
+fi
+
 echo
-echo "----------------Installation of NCT6687d Drivers successfull-----------------"
+echo "----------------Installation of NCT6687d Drivers successful------------------"
 echo
 
 </INLINE>
