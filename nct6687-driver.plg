@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "nct6687-driver">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2021.03.25">
+  <!ENTITY version   "2021.06.22">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
@@ -12,6 +12,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0">
 
 <CHANGES>
+
+###2021.06.22
+- Changed package download
 
 ###2021.03.25
 - Added wait for network and timout
@@ -44,8 +47,8 @@ Source: https://github.com/Fred78290/nct6687d
 <INLINE>
 
 KERNEL_V="$(uname -r)"
-PACKAGE="nct6687d"
-DL_URL="https://github.com/ich777/unraid-plugins-repo/releases/download/$KERNEL_V"
+PACKAGE="nct6687d-plugin-$KERNEL_V"
+DL_URL="https://github.com/ich777/unraid-nct6687-driver/releases/download/$KERNEL_V"
 
 #Wait for Network and timeout after 30 seconds
 HOST="8.8.8.8"
