@@ -15,6 +15,7 @@
 
 ###2021.06.22
 - Changed package download
+- Fixed icon not sowing up
 
 ###2021.03.25
 - Added wait for network and timout
@@ -63,6 +64,10 @@ fi
 #Check for old packages
 rm -rf $(ls -d &plugin;/packages/* | grep -v "${KERNEL_V%%-*}")
 
+if [ ! -f "&plugin;/&name;.png" ]; then
+  wget -q -nc -O "&plugin;/&name;.png" "https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/nuvoton.png"
+fi
+
 download() {
 #Download NCT6687d Drivers
 if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz" "${DL_URL}/${PACKAGE}-1.txz" ; then
@@ -109,10 +114,12 @@ depmod -a
 check
 install > /dev/null
 
-#Check if icon is already installed
-if [ ! -f &emhttp;/images/nuvoton.png ]; then
-  mkdir -p &emhttp;/images
-  wget -O &emhttp;/images/nuvoton.png https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/nuvoton.png
+#Install icon
+if [ ! -f "&emhttp;/images/&name;.png" ]; then
+  if [ ! -d "&emhttp;/images" ]; then
+    mkdir -p &emhttp;/images
+  fi
+  cp &plugin;/&name;.png &emhttp;/images/
 fi
 
 echo
