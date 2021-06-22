@@ -1,8 +1,11 @@
+# Create necessary directories and clone repository
 mkdir ${DATA_DIR}/NCT6687
 mkdir -p /nct/lib/modules/${UNAME}
 cd ${DATA_DIR}/NCT6687
 git clone https://github.com/Fred78290/nct6687d
 cd ${DATA_DIR}/NCT6687/nct*
+
+# Patch Makefile and install the Kernel module to a temporary directory
 echo -e 'obj-m += nct6687.o
 
 all:
@@ -21,6 +24,7 @@ cd ${DATA_DIR}
 mkdir -p /nct/usr/local/emhttp/plugins/nct6687-driver/images
 wget -O /nct/usr/local/emhttp/plugins/nct6687-driver/images/nuvoton.png https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/nuvoton.png
 
+# Create Slackware package
 PLUGIN_NAME="nct6687d"
 BASE_DIR="/nct"
 TMP_DIR="/tmp/${PLUGIN_NAME}_"$(echo $RANDOM)""
