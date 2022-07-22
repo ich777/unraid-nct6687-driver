@@ -93,7 +93,7 @@ fi
 
 install() {
 #Install NCT6687d Drivers
-/sbin/installpkg "&plugin;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz"
+/sbin/installpkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}*.txz"
 depmod -a
 }
 
@@ -106,8 +106,8 @@ KERNEL_V="$(uname -r)"
 PACKAGE="nct6687d"
 DL_URL="https://github.com/ich777/unraid-nct6687-driver/releases/download/$KERNEL_V"
 
-if [ ! -d "&plugin;/packages/${KERNEL_V%%-*}" ]; then
-  mkdir -p "&plugin;/packages/${KERNEL_V%%-*}"
+if [ ! -d "&packages;/${KERNEL_V%%-*}" ]; then
+  mkdir -p "&packages;/${KERNEL_V%%-*}"
 fi
 
 if [ ! -f "&plugin;/&name;.png" ]; then
@@ -115,7 +115,7 @@ if [ ! -f "&plugin;/&name;.png" ]; then
 fi
 
 #Check for old packages
-rm -rf $(ls -d &plugin;/packages/* | grep -v "${KERNEL_V%%-*}")
+rm -rf $(ls -d &packages;/* | grep -v "${KERNEL_V%%-*}")
 
 #Check if NCT6687d Drivers are allready downloaded
 check
