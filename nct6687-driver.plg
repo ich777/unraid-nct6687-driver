@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "nct6687-driver">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.07.10">
+  <!ENTITY version   "2025.04.25">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
@@ -13,6 +13,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0">
 
 <CHANGES>
+
+###2025.04.25
+- Blacklist NCT6683 module on installation
 
 ###2024.07.10
 - Add Plugin Update Helper to ensure driver package is downloaded ahead of time when unRAID is updated
@@ -60,6 +63,14 @@ Source: https://github.com/Fred78290/nct6687d
 
 <FILE Run="/bin/bash">
 <INLINE>
+
+#Check if NCT6683 module is blacklisted if not blacklist it
+if [ ! "$(grep "blacklist" /boot/config/modprobe.d/nct6683.conf 2>/dev/null)" ]; then
+  if [ ! -d /boot/config/modprobe.d ]; then
+    mkdir -p /boot/config/modprobe.d
+  fi
+  echo "blacklist nct6683" >> /boot/config/modprobe.d/nct6683.conf
+fi
 
 download() {
 #Download NCT6687d Drivers
@@ -195,6 +206,12 @@ echo "---Uninstalling NCT6687d Drivers---"
 echo "-----------------------------------"
 # Remove plugin related files
 rm -rf &plugin; &emhttp;
+# Remove blacklist
+if [ "$(grep -v "blacklist" /boot/config/modprobe.d/nct6683.conf 2>/dev/null)" ]; then
+  sed -i '/blacklist nct6683/d' /boot/config/modprobe.d/nct6683.conf 2>/dev/null
+else
+  rm -rf /boot/config/modprobe.d/nct6683.conf 2>/dev/null
+fi
 echo
 echo "--------------------------------------------------------------"
 echo "---NCT6687d Drivers uninstalled, please reboot your server!---"
